@@ -82,7 +82,7 @@ async def dailywife(bot, ev: CQEvent, wife_id=None):
     #if priv.check_priv(ev, priv.SUPERUSER):
     #    wife_id = bot_id
     # If wife_id is already assigned
-    if wife_id != None:
+    if wife_id is not None:
         pass
     elif config != None:
         if str(user_id) in list(config):
