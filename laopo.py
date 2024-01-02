@@ -71,16 +71,19 @@ def write_group_config(group_id: str,link_id:str,wife_id:str,date:str,config) ->
         json.dump(config, f, ensure_ascii=False)
 
 @sv.on_fullmatch('今日老婆')
-async def dailywife(bot, ev: CQEvent):
+async def dailywife(bot, ev: CQEvent, wife_id=None):
     groupid = ev.group_id
     user_id = ev.user_id
     bot_id = ev.self_id
-    wife_id = None
+    #wife_id = None
     today = str(datetime.date.today())
     config = load_group_config(groupid)
 
-    if priv.check_priv(ev, priv.SUPERUSER):
-        wife_id = bot_id
+    #if priv.check_priv(ev, priv.SUPERUSER):
+    #    wife_id = bot_id
+    # If wife_id is already assigned
+    if wife_id != None:
+        pass
     elif config != None:
         if str(user_id) in list(config):
             if config[str(user_id)][1] == today:
@@ -105,7 +108,15 @@ async def dailywife(bot, ev: CQEvent):
         wife_id = choice(id_list)
 
     write_group_config(groupid,user_id,wife_id,today,config)
-    member_info = await bot.get_group_member_info(group_id=groupid,user_id=wife_id)
+    member_info = await bot.get_group_member_info(
+            group_id=groupid,user_id=wife_id)
     result = await get_wife_info(member_info,wife_id)   
     await bot.send(ev,result,at_sender=True)
     
+@sv.on_fullmatch('今日老公')
+async def dailyhusband(bot, ev: CQEvent):
+    # If there is at least one superusers
+    if len(bot.config.SUPERUSERS) > 0:
+        wife_id = choice(bot.config.SUPERUSERS)
+        await dailywife(bot, ev, wife_id)
+
