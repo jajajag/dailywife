@@ -106,8 +106,9 @@ async def dailywife(bot, ev: CQEvent, wife_id=None):
                     except:
                         del config[record_id]
         wife_id = choice(id_list)
-
-    write_group_config(groupid,user_id,wife_id,today,config)
+        # Write the group config only when the wife_id is None
+        write_group_config(groupid,user_id,wife_id,today,config)
+    #write_group_config(groupid,user_id,wife_id,today,config)
     member_info = await bot.get_group_member_info(
             group_id=groupid,user_id=wife_id)
     result = await get_wife_info(member_info,wife_id)   
