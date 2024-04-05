@@ -50,8 +50,8 @@ async def get_wife_info(member_info, qqid, is_wife=True):
     # Change name if needed
     name = '老婆' if is_wife else '老公'
     result = f'''\n你今天的群友{name}是:
-    [CQ:image,file={avatar}]
-    {member_name}({qqid})'''
+[CQ:image,file={avatar}]
+{member_name}({qqid})'''
     return result
 
 def load_group_config(group_id: str) -> int:
