@@ -42,14 +42,16 @@ async def download_url(url: str) -> bytes:
             except Exception as e:
                 print(f"Error downloading {url}, retry {i}/3: {str(e)}")
 
-async def get_wife_info(member_info,qqid):  
+async def get_wife_info(member_info, qqid, is_wife=True):
     img = await download_avatar(qqid)
     base64_str = base64.b64encode(img).decode()
     avatar =  'base64://' + base64_str
     member_name = (member_info["card"] or member_info["nickname"])
-    result = f'''\n你今天的群友老婆是:
-[CQ:image,file={avatar}]
-{member_name}({qqid})'''
+    # Change name if needed
+    name = '老婆' if is_wife else '老公'
+    result = f'''\n你今天的群友{name}是:
+    [CQ:image,file={avatar}]
+    {member_name}({qqid})'''
     return result
 
 def load_group_config(group_id: str) -> int:
@@ -76,6 +78,7 @@ async def dailywife(bot, ev: CQEvent, wife_id=None):
     user_id = ev.user_id
     bot_id = ev.self_id
     #wife_id = None
+    is_wife = True
     today = str(datetime.date.today())
     config = load_group_config(groupid)
 
@@ -83,7 +86,8 @@ async def dailywife(bot, ev: CQEvent, wife_id=None):
     #    wife_id = bot_id
     # If wife_id is already assigned
     if wife_id is not None:
-        pass
+        # Change the name to husband if wife_id is assigned
+        is_wife = False
     elif config != None:
         if str(user_id) in list(config):
             if config[str(user_id)][1] == today:
@@ -111,7 +115,7 @@ async def dailywife(bot, ev: CQEvent, wife_id=None):
     #write_group_config(groupid,user_id,wife_id,today,config)
     member_info = await bot.get_group_member_info(
             group_id=groupid,user_id=wife_id)
-    result = await get_wife_info(member_info,wife_id)   
+    result = await get_wife_info(member_info, wife_id, is_wife)
     await bot.send(ev,result,at_sender=True)
     
 @sv.on_fullmatch('今日老公')
@@ -120,4 +124,3 @@ async def dailyhusband(bot, ev: CQEvent):
     if len(bot.config.SUPERUSERS) > 0:
         wife_id = choice(bot.config.SUPERUSERS)
         await dailywife(bot, ev, wife_id)
-
